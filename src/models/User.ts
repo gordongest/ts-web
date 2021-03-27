@@ -1,15 +1,15 @@
+import axios, { AxiosResponse } from 'axios';
+
 interface UserProps {
   name?: string;
   age?: number;
   id?: number;
 }
 
-type Callback = () => void; // function that returns nothing
-
 export class User {
   constructor(private data: UserProps) {}
 
-  events: { [key: string]: Callback[] } = {};
+  url: string = 'http://localhost:3000/users';
 
   get(propName: string): string | number {
     return this.data[propName];
@@ -19,22 +19,21 @@ export class User {
     Object.assign(this.data, props);
   }
 
-  on(eventName: string, callback: Callback): void {
-    const handlers = this.events[eventName] || []; // either empty array or current array of callbacks for event
-    handlers.push(callback); // add new callback to array for event
-    this.events[eventName] = handlers; // reassign array for event
+  fetch(): void {
+    axios
+      .get(`${this.url}/${this.get('id')}`)
+      .then((response: AxiosResponse): void => {
+        this.set(response.data);
+      });
   }
 
-  trigger(eventName: string): void {
-    const handlers = this.events[eventName];
-    if (!handlers || !handlers.length) {
-      return;
+  save(): void {
+    const id = this.get('id');
+
+    if (id) {
+      axios.put(`${this.url}/${id}`, this.data);
+    } else {
+      axios.post(`${this.url}`, this.data);
     }
-
-    handlers.forEach((callback) => callback());
   }
-
-  fetch() {}
-
-  save() {}
 }
