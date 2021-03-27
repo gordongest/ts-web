@@ -1,11 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
-import { UserProps } from './User';
-import { User } from './User';
 import { Eventing } from './Eventing';
 
-export class Collection {
-  constructor(public url: string) {}
-  models: User[] = [];
+/* USERS EXAMPLE */
+/* Take in types User (T), UserProps (K) */
+export class Collection<T, K> {
+  /* deserialize takes a function which takes argument of type UserProps (K) and returns a User (T) */
+  constructor(public url: string, public deserialize: (json: K) => T) {}
+
+  /* models is an array of Users (T) */
+  models: T[] = [];
   events: Eventing = new Eventing();
 
   get on() {
@@ -18,9 +21,11 @@ export class Collection {
 
   fetch(): void {
     axios.get(this.url).then((response: AxiosResponse) => {
-      response.data.forEach((i: UserProps) => {
-        const user = User.create(i);
-        this.models.push(user);
+      /* loop through the array, object at each index is of type UserProps (K) */
+      response.data.forEach((i: K) => {
+        /* call deserialize (which is being given User.create) on index */
+        /* add new User (T) instance to array of type User (T[]) */
+        this.models.push(this.deserialize(i));
       });
 
       this.trigger('change');

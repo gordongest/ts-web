@@ -1,11 +1,9 @@
-import axios, { AxiosResponse } from 'axios';
 import { User } from './models/User';
-import { Collection } from './models/Collection'
 
-const collection = new Collection('http://localhost:3000/users')
+const collection = User.createCollection();
 
 collection.on('change', () => {
-  console.log(collection.models)
-})
+  console.log(collection.models);
+});
 
-collection.fetch()
+collection.fetch();
