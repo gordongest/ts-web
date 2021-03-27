@@ -136,6 +136,10 @@ function () {
     return this.data[propName];
   };
 
+  User.prototype.set = function (props) {
+    Object.assign(this.data, props);
+  };
+
   return User;
 }();
 
@@ -154,6 +158,11 @@ var user = new User_1.User({
   age: 36
 });
 console.log(user);
+console.log(user.get('name'));
+user.set({
+  name: 'nodroG'
+});
+console.log(user.get('name'));
 },{"./models/User":"src/models/User.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
