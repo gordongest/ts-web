@@ -1,10 +1,5 @@
 // import axios from 'axios';
 import { User } from './models/User';
 
-const user = new User({ id: 2, name: 'Groond', age:54 })
+const user = User.create({ name: 'Dorgon', age: 72 });
 
-user.on('save', () => {
-  console.log(user)
-})
-
-user.save();

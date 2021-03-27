@@ -117,7 +117,95 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/Eventing.ts":[function(require,module,exports) {
+})({"src/models/Model.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Model = void 0;
+
+var Model =
+/** @class */
+function () {
+  function Model(attributes, events, sync) {
+    this.attributes = attributes;
+    this.events = events;
+    this.sync = sync;
+    this.on = this.events.on;
+    this.trigger = this.events.trigger;
+    this.get = this.attributes.get;
+  }
+
+  Model.prototype.set = function (update) {
+    this.attributes.set(update);
+    this.events.trigger('change');
+  };
+
+  Model.prototype.fetch = function () {
+    var _this = this;
+
+    var id = this.get('id');
+
+    if (typeof id !== 'number') {
+      throw new Error('Cannot fetch');
+    }
+
+    this.sync.fetch(id).then(function (response) {
+      _this.set(response.data);
+    });
+  };
+
+  Model.prototype.save = function () {
+    var _this = this;
+
+    this.sync.save(this.attributes.getAll()).then(function (response) {
+      return _this.trigger('save');
+    }).catch(function () {
+      return _this.trigger('err');
+    });
+  };
+
+  return Model;
+}();
+
+exports.Model = Model;
+},{}],"src/models/Atrributes.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Attributes = void 0;
+
+var Attributes =
+/** @class */
+function () {
+  function Attributes(data) {
+    var _this = this;
+
+    this.data = data;
+    /* this function expects to take in an argument K which is a key of the object T.
+    It then expects to return the value on the object T at key K */
+
+    this.get = function (key) {
+      return _this.data[key];
+    };
+
+    this.getAll = function () {
+      return _this.data;
+    };
+
+    this.set = function (update) {
+      Object.assign(_this.data, update);
+    };
+  }
+
+  return Attributes;
+}();
+
+exports.Attributes = Attributes;
+},{}],"src/models/Eventing.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1970,22 +2058,22 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Sync = void 0;
+exports.APISync = void 0;
 
 var axios_1 = __importDefault(require("axios"));
 
-var Sync =
+var APISync =
 /** @class */
 function () {
-  function Sync(url) {
+  function APISync(url) {
     this.url = url;
   }
 
-  Sync.prototype.fetch = function (id) {
+  APISync.prototype.fetch = function (id) {
     return axios_1.default.get(this.url + "/" + id);
   };
 
-  Sync.prototype.save = function (data) {
+  APISync.prototype.save = function (data) {
     var id = data.id;
 
     if (id) {
@@ -1995,128 +2083,74 @@ function () {
     }
   };
 
-  return Sync;
+  return APISync;
 }();
 
-exports.Sync = Sync;
-},{"axios":"node_modules/axios/index.js"}],"src/models/Atrributes.ts":[function(require,module,exports) {
+exports.APISync = APISync;
+},{"axios":"node_modules/axios/index.js"}],"src/models/User.ts":[function(require,module,exports) {
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Attributes = void 0;
-
-var Attributes =
-/** @class */
-function () {
-  function Attributes(data) {
-    var _this = this;
-
-    this.data = data;
-    /* this function expects to take in an argument K which is a key of the object T.
-    It then expects to return the value on the object T at key K */
-
-    this.get = function (key) {
-      return _this.data[key];
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
     };
 
-    this.getAll = function () {
-      return _this.data;
-    };
+    return _extendStatics(d, b);
+  };
 
-    this.set = function (update) {
-      Object.assign(_this.data, update);
-    };
-  }
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 
-  return Attributes;
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
 }();
-
-exports.Attributes = Attributes;
-},{}],"src/models/User.ts":[function(require,module,exports) {
-"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.User = void 0;
 
+var Model_1 = require("./Model");
+
+var Atrributes_1 = require("./Atrributes");
+
 var Eventing_1 = require("./Eventing");
 
 var APISync_1 = require("./APISync");
-
-var Atrributes_1 = require("./Atrributes");
 
 var url = 'http://localhost:3000/users';
 
 var User =
 /** @class */
-function () {
-  function User(data) {
-    this.data = data;
-    this.events = new Eventing_1.Eventing();
-    this.sync = new APISync_1.Sync(url);
-    this.attributes = new Atrributes_1.Attributes(data);
+function (_super) {
+  __extends(User, _super);
+
+  function User() {
+    return _super !== null && _super.apply(this, arguments) || this;
   }
 
-  Object.defineProperty(User.prototype, "get", {
-    get: function get() {
-      return this.attributes.get;
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  User.prototype.set = function (update) {
-    this.attributes.set(update);
-    this.events.trigger('change');
-  };
-
-  Object.defineProperty(User.prototype, "on", {
-    get: function get() {
-      return this.events.on;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(User.prototype, "trigger", {
-    get: function get() {
-      return this.events.trigger;
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  User.prototype.fetch = function () {
-    var _this = this;
-
-    var id = this.get('id');
-
-    if (typeof id !== 'number') {
-      throw new Error('Cannot fetch');
-    }
-
-    this.sync.fetch(id).then(function (response) {
-      _this.set(response.data);
-    });
-  };
-
-  User.prototype.save = function () {
-    var _this = this;
-
-    this.sync.save(this.attributes.getAll()).then(function (response) {
-      return _this.trigger('save');
-    }).catch(function () {
-      return _this.trigger('err');
-    });
+  User.create = function (attrs) {
+    return new User(new Atrributes_1.Attributes(attrs), new Eventing_1.Eventing(), new APISync_1.APISync(url));
   };
 
   return User;
-}();
+}(Model_1.Model);
 
 exports.User = User;
-},{"./Eventing":"src/models/Eventing.ts","./APISync":"src/models/APISync.ts","./Atrributes":"src/models/Atrributes.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./Model":"src/models/Model.ts","./Atrributes":"src/models/Atrributes.ts","./Eventing":"src/models/Eventing.ts","./APISync":"src/models/APISync.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2125,15 +2159,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var User_1 = require("./models/User");
 
-var user = new User_1.User({
-  id: 2,
-  name: 'Groond',
-  age: 54
+var user = User_1.User.create({
+  name: 'Dorgon',
+  age: 72
 });
-user.on('save', function () {
-  console.log(user);
-});
-user.save();
 },{"./models/User":"src/models/User.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -2162,7 +2191,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49937" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57377" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
