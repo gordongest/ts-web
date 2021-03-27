@@ -140,6 +140,10 @@ function () {
     Object.assign(this.data, props);
   };
 
+  User.prototype.on = function (event, callback) {};
+
+  User.prototype.trigger = function () {};
+
   return User;
 }();
 
@@ -157,10 +161,9 @@ var user = new User_1.User({
   name: 'Gordon',
   age: 36
 });
-console.log(user);
 console.log(user.get('name'));
 user.set({
-  name: 'nodroG'
+  name: 'Rognod'
 });
 console.log(user.get('name'));
 },{"./models/User":"src/models/User.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
