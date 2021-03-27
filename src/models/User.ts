@@ -1,8 +1,7 @@
-import axios from 'axios';
-
 interface UserProps {
   name?: string;
   age?: number;
+  id?: number;
 }
 
 type Callback = () => void; // function that returns nothing
@@ -35,11 +34,7 @@ export class User {
     handlers.forEach((callback) => callback());
   }
 
-  fetch(): Promise<any> {
-    return new Promise();
-  }
+  fetch() {}
 
-  save(): Promise<any> {
-    return new Promise();
-  }
+  save() {}
 }

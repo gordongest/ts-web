@@ -1,20 +1,13 @@
-import { User } from './models/User'
+import axios from 'axios';
+import { User } from './models/User';
 
-const user = new User({name: 'Gordon', age: 36})
+const url = 'http://localhost:3000/users';
+const user = {
+  name: 'Rognod',
+  age: 36,
+};
 
-user.on('change', () => {
-  console.log('change')
-})
-user.on('change', () => {
-  console.log('oh no')
-})
-user.on('click', () => {
-  console.log('clikke')
-})
-user.on('save', () => {
-  console.log('checkpoint')
-})
+// axios.post(url, user);
 
-user.trigger('click')
-user.trigger('change')
-user.trigger('save')
+axios.get(`${url}/1`)
+  .then((response) => console.log(response.data));
