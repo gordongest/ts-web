@@ -1,14 +1,17 @@
 import axios, { AxiosPromise } from 'axios';
-import { UserProps } from './User';
 
-export class Sync<T> {
+interface withID {
+  id: number;
+}
+
+export class Sync<T extends withID> {
   constructor(public url: string) {}
 
-  fetch(id: number, data: UserProps): AxiosPromise {
+  fetch(id: number): AxiosPromise {
     return axios.get(`${this.url}/${id}`);
   }
 
-  save(data: UserProps): AxiosPromise {
+  save(data: T): AxiosPromise {
     const { id } = data;
 
     if (id) {
@@ -16,7 +19,5 @@ export class Sync<T> {
     } else {
       return axios.post(this.url, data);
     }
-
-
   }
 }
