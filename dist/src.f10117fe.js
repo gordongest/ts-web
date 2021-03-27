@@ -130,6 +130,7 @@ var User =
 function () {
   function User(data) {
     this.data = data;
+    this.events = {};
   }
 
   User.prototype.get = function (propName) {
@@ -140,9 +141,33 @@ function () {
     Object.assign(this.data, props);
   };
 
-  User.prototype.on = function (event, callback) {};
+  User.prototype.on = function (eventName, callback) {
+    var handlers = this.events[eventName] || []; // either empty array or current array of callbacks for event
 
-  User.prototype.trigger = function () {};
+    handlers.push(callback); // add new callback to array for event
+
+    this.events[eventName] = handlers; // reassign array for event
+  };
+
+  User.prototype.trigger = function (eventName) {
+    var handlers = this.events[eventName];
+
+    if (!handlers || !handlers.length) {
+      return;
+    }
+
+    handlers.forEach(function (callback) {
+      return callback();
+    });
+  };
+
+  User.prototype.fetch = function () {
+    return new Promise();
+  };
+
+  User.prototype.save = function () {
+    return new Promise();
+  };
 
   return User;
 }();
@@ -161,11 +186,21 @@ var user = new User_1.User({
   name: 'Gordon',
   age: 36
 });
-console.log(user.get('name'));
-user.set({
-  name: 'Rognod'
+user.on('change', function () {
+  console.log('change');
 });
-console.log(user.get('name'));
+user.on('change', function () {
+  console.log('oh no');
+});
+user.on('click', function () {
+  console.log('clikke');
+});
+user.on('save', function () {
+  console.log('checkpoint');
+});
+user.trigger('click');
+user.trigger('change');
+user.trigger('save');
 },{"./models/User":"src/models/User.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
