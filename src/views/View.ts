@@ -48,6 +48,10 @@ export abstract class View<T extends Model<K>, K> {
     }
   }
 
+  onRender(): void {
+    
+  }
+
   render(): void {
     const templateElement = document.createElement('template'); /* create an element of type template */
 
@@ -58,6 +62,8 @@ export abstract class View<T extends Model<K>, K> {
       this.mapRegions(templateElement.content)
 
       this.parent.innerHTML = ''; /* empty the parent element */
+
+      this.onRender();
 
       this.parent.append(templateElement.content); /* append template to the parent element */
   }
