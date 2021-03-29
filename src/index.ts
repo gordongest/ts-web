@@ -1,5 +1,18 @@
+import { User } from './models/User';
 import { UserForm } from './views/UserForm';
 
-const userForm = new UserForm(document.getElementById('root'));
+const attrs = {
+  name: 'Rongod',
+  age: 90
+}
 
-userForm.render();
+const user = User.create(attrs)
+
+const root = document.getElementById('root');
+
+if (root) {
+  const userForm = new UserForm(root, user);
+  userForm.render();
+} else {
+  throw new Error('whoopsie')
+}
