@@ -2267,12 +2267,18 @@ var View = /*#__PURE__*/function () {
 
     this.parent = parent;
     this.model = model;
+    this.regions = {};
     this.bindModel();
   }
 
   _createClass(View, [{
     key: "eventsMap",
     value: function eventsMap() {
+      return {};
+    }
+  }, {
+    key: "regionsMap",
+    value: function regionsMap() {
       return {};
     }
   }, {
@@ -2305,6 +2311,20 @@ var View = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "mapRegions",
+    value: function mapRegions(fragment) {
+      var regionsMap = this.regionsMap();
+
+      for (var key in regionsMap) {
+        var selector = regionsMap[key];
+        var element = fragment.querySelector(selector);
+
+        if (element) {
+          this.regions[key] = element;
+        }
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       var templateElement = document.createElement('template');
@@ -2316,6 +2336,7 @@ var View = /*#__PURE__*/function () {
       this.bindEvents(templateElement.content);
       /* bind events */
 
+      this.mapRegions(templateElement.content);
       this.parent.innerHTML = '';
       /* empty the parent element */
 
