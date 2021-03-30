@@ -2587,7 +2587,6 @@ var root = document.getElementById('root');
 if (root) {
   var userEdit = new UserEdit_1.UserEdit(root, user);
   userEdit.render();
-  console.log(userEdit);
 } else {
   throw new Error('whoopsie');
 }
